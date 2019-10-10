@@ -1,6 +1,7 @@
 {
     "name": "inweb/admin-resource-tool-images",
     "description": "InWeb Admin resource tool for images manipulation",
+    "version": "0.1.0",
     "keywords": [
         "laravel"
     ],
