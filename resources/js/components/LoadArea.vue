@@ -14,7 +14,7 @@
                 <slot>{{ __('Выберите файл') }}</slot>
             </span>
 
-            <input type='file' class="gallery__load-area__input hidden" multiple @change="load($event.target.files)"/>
+            <input type='file' :accept="inputTypes" class="gallery__load-area__input hidden" multiple @change="load($event.target.files)"/>
         </label>
     </div>
 </template>
@@ -28,6 +28,10 @@
                 type: Number,
                 default: 2
             },
+            types: {
+                type: Array,
+                default: () => [],
+            }
         },
 
         data() {
@@ -53,6 +57,18 @@
                 return true
             },
 
+            checkType(file) {
+                if (! file.errors)
+                    file.errors = [];
+
+                if (this.types.length && ! this.types.includes(file.type)) {
+                    file.errors.push(this.__('Unsupported file type'))
+                    return false
+                }
+
+                return true
+            },
+
             drop(event) {
                 event.preventDefault()
                 this.over = false
@@ -65,10 +81,16 @@
             },
 
             load(files) {
-                [...files].forEach(file => this.checkSize(file))
+                [...files].forEach(file => this.checkSize(file) && this.checkType(file))
 
                 this.$emit('load', files)
             }
         },
+
+        computed: {
+            inputTypes() {
+                return this.types.length ? this.types.join(',') : '*'
+            }
+        }
     }
 </script>

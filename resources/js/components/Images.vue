@@ -1,6 +1,6 @@
 <template>
     <div class="gallery">
-        <load-area @load="load" class="mb-4"/>
+        <load-area @load="load" :types="field.types" class="mb-4"/>
 
         <loaded-files v-if="loadedImages.length" :images="loadedImages" @remove="removeLoaded"
                       @upload="upload"></loaded-files>
@@ -20,6 +20,7 @@
         props: {
             resourceName: {},
             resourceId: {},
+            field: {},
             multiple: {
                 type: Boolean,
                 default: true
@@ -67,6 +68,7 @@
                             },
                             name: file.name,
                             file_name: file.name,
+                            type: file.type,
                             errors: errors,
                             loading: false
                         }
