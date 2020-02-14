@@ -1,9 +1,30 @@
 .gallery__load-area__label {
     transition: all .15s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 16rem;
 }
 
 .gallery__load-area--over {
     background-color: #f1f5f8;
+}
+
+.gallery__load-area--over, .gallery__load-area:hover {
+    .gallery__load-area__buttons--with-content {
+        opacity: 1;
+    }
+}
+
+.gallery__load-area__buttons--with-content {
+    transition: all .15s ease;
+    opacity: 0;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #FFF;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
 }
 
 .gallery__element {
