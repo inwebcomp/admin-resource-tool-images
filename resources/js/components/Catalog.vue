@@ -21,8 +21,7 @@
         computed: {
             dragOptions() {
                 return {
-                    delay: 0,
-                    touchStartThreshold: 0,
+                    delay: 100,
                     forceFallback: true,
                     animation: 150,
                     ghostClass: "ghost",
