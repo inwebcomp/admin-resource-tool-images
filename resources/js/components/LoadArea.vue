@@ -56,8 +56,8 @@
             }
         },
 
-        created() {
-            document.addEventListener('drop', this.drop)
+        mounted() {
+            this.$refs.area.addEventListener('drop', this.drop)
         },
 
         methods: {

@@ -11,6 +11,7 @@ use InWeb\Admin\App\Actions\ActionEvent;
 use InWeb\Admin\App\Http\Controllers\Controller;
 use InWeb\Admin\App\Http\Requests\AdminRequest;
 use InWeb\Admin\App\Http\Requests\ResourceDetailRequest;
+use InWeb\Base\Contracts\Cacheable;
 use InWeb\Base\Entity;
 use InWeb\Media\Images\Image;
 use InWeb\Media\Images\WithImages;
@@ -161,6 +162,11 @@ class ImagesController extends Controller
 
     public function changePositions(AdminRequest $request)
     {
+        $model = $request->findModelOrFail();
+
+        if ($model instanceof Cacheable)
+            $model::clearCache($model);
+
         Image::updatePositionsById($request->input('images'));
     }
 }
