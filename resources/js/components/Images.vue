@@ -1,6 +1,6 @@
 <template>
     <div class="gallery">
-        <load-area @load="load" class="mb-4"/>
+        <load-area @load="load" class="mb-4" :max-size="10"/>
         <div class="text-center my-4">{{ __('или') }}</div>
         <url-area @load="uploadViaUrl" class="mb-4"/>
 
