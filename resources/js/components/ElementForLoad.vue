@@ -10,6 +10,7 @@
             <i class="fas fa-spinner-third gallery__element__loading" v-if="loading"></i>
 
             <div class="gallery__element__error" v-for="(error) in errors">{{ error }}</div>
+            <progress-bar :progress="progress"/>
 
             <div class="gallery__element__remove" @click.stop="$emit('remove')">
                 <i class="far fa-times"></i>
@@ -19,13 +20,18 @@
 </template>
 
 <script>
+    import ProgressBar from "./ProgressBar"
     export default {
         name: 'ElementForLoad',
-
+        components: {ProgressBar},
         props: {
             loading: {
                 type: Boolean,
                 default: false
+            },
+            progress: {
+                type: Number,
+                default: null
             },
             errors: {
                 type: Array,

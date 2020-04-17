@@ -17,6 +17,7 @@
 
                 <span class="gallery__load-area__text mt-2 text-base leading-normal">
                     {{ title ? title : __('Выберите файл') }}
+                    <div v-if="maxSize" class="normal-case text-center text-grey">({{__('макс.') + ' ' + maxSizePretty }})</div>
                 </span>
 
                 <div class="text-grey hover:text-danger text-xl absolute" style="top: 1rem; right: 1rem;" v-if="clear && $slots.default" @click.stop.prevent="$emit('clear')">
@@ -24,7 +25,7 @@
                 </div>
             </div>
 
-            <input type='file' class="gallery__load-area__input hidden" :multiple="multiple" :accept="accept" @change="load($event.target.files)"/>
+            <input type='file' class="gallery__load-area__input hidden" :multiple="multiple" :accept="accept" @change="load($event, $event.target.files)"/>
         </label>
     </div>
 </template>
@@ -60,6 +61,12 @@
             this.$refs.area.addEventListener('drop', this.drop)
         },
 
+        computed: {
+            maxSizePretty() {
+                return this.maxSize + ' ' + this.__(' Мб')
+            }
+        },
+
         methods: {
             checkSize(file) {
                 if (! file.errors)
@@ -68,6 +75,18 @@
                 if (file.size > this.maxSize * 1000000) {
                     file.errors.push(this.__('Max file size is :sizeMB', {size: this.maxSize}))
                     return false
+                }
+
+                return true
+            },
+
+            checkMimeType(file) {
+                if (! file.errors)
+                    file.errors = [];
+
+                if (this.accept && this.accept.indexOf(file.type) == -1) {
+                    file.errors.push(this.__('File type ":type" is incorrect', {type: file.type}))
+                    return;
                 }
 
                 return true
@@ -84,10 +103,12 @@
                 return false
             },
 
-            load(files) {
-                [...files].forEach(file => this.checkSize(file))
+            load(event, files) {
+                [...files].forEach(file => this.checkSize(file) && this.checkMimeType(file))
 
                 this.$emit('load', files)
+
+                event.target.value = "";
             }
         },
     }

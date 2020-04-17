@@ -35,7 +35,7 @@ class ImagesController extends Controller
     /**
      * @param ResourceDetailRequest $request
      * @return mixed
-     * @throws FileNotFoundException
+     * @throws \Throwable
      * @todo Lock uploading when many requests are sent
      */
     public function store(ResourceDetailRequest $request)

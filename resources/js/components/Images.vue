@@ -1,11 +1,18 @@
 <template>
     <div class="gallery">
-        <load-area @load="load" class="mb-4" :max-size="10"/>
+        <load-area @load="load" class="mb-4" :max-size="field.maxSize" :accept="field.accept"
+                   :multiple="field.multiple"/>
         <div class="text-center my-4">{{ __('или') }}</div>
         <url-area @load="uploadViaUrl" class="mb-4"/>
 
         <loaded-files v-if="loadedImages.length" :images="loadedImages" @remove="removeLoaded"
                       @upload="upload"></loaded-files>
+
+        <div class="my-4">
+            <label class="flex items-center">{{ __('Удаление без подтверждения') }}
+                <switch-input class="ml-4" v-model="fastDelete"></switch-input>
+            </label>
+        </div>
 
         <catalog :images="images" @remove="remove" @changePositions="changePositions" @setMain="setMain"></catalog>
     </div>
@@ -16,6 +23,8 @@
     import UrlArea from "./UrlArea"
     import LoadedFiles from "./LoadedFiles"
     import Catalog from "./Catalog"
+
+    import axios from 'axios'
 
     export default {
         components: {
@@ -28,10 +37,7 @@
         props: {
             resourceName: {},
             resourceId: {},
-            multiple: {
-                type: Boolean,
-                default: true
-            },
+            field: {},
         },
 
         data() {
@@ -41,6 +47,7 @@
                 loading: false,
                 loadingRemove: false,
                 loadingSetMain: false,
+                fastDelete: false,
             }
         },
 
@@ -67,6 +74,7 @@
                     file = new File([file], file.name, {type: file.type})
                     let reader = new FileReader()
                     reader.readAsDataURL(file)
+
                     reader.onload = () => {
                         const fileData = {
                             file: file,
@@ -76,8 +84,10 @@
                             name: file.name,
                             file_name: file.name,
                             errors: errors,
+                            progress: 0,
                             loading: false
                         }
+
                         if (this.multiple) {
                             this.loadedImages.push(fileData)
                         } else {
@@ -90,7 +100,7 @@
             },
 
             upload(index = 0) {
-                if (! this.loadedImages.length) {
+                if (!this.loadedImages.length) {
                     this.loading = false
                     return
                 }
@@ -103,15 +113,15 @@
                 let file
 
                 while (true) {
-                    if (! this.loadedImages[index]) {
+                    if (!this.loadedImages[index]) {
                         this.loading = false
-                        return;
+                        return
                     }
 
                     file = this.loadedImages[index]
 
-                    if (! file.errors.length)
-                        break;
+                    if (!file.errors.length)
+                        break
 
                     index++
                 }
@@ -124,18 +134,22 @@
             uploadRequest(file, index) {
                 let files = [file]
 
-                files = files.filter(file => ! file.sending)
+                files = files.filter(file => !file.sending)
 
-                if (! files.length)
+                if (!files.length)
                     return
 
                 files.forEach(file => file.sending = true)
 
                 App.api.request({
-                    method: 'POST',
+                    method: 'PUT',
                     url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId,
                     data: {
                         images: files
+                    },
+                }, {
+                    onUploadProgress: (progressEvent) => {
+                        files.forEach(file => file.progress = progressEvent.loaded / progressEvent.total)
                     }
                 }).then(({images}) => {
                     App.$emit('imageUploaded', files)
@@ -157,11 +171,11 @@
             },
 
             uploadViaUrl(url) {
-                if (! url)
+                if (!url)
                     return
 
                 App.api.request({
-                    method: 'POST',
+                    method: 'PUT',
                     url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId,
                     data: {
                         url,
@@ -189,8 +203,10 @@
                 if (this.loadingRemove)
                     return
 
-                if (! confirm(this.__('Are you sure to delete the image?')))
-                    return
+                if (!this.fastDelete) {
+                    if (!confirm(this.__('Are you sure to delete the image?')))
+                        return
+                }
 
                 this.loadingRemove = true
 
