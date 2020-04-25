@@ -4,12 +4,14 @@
          @dragleave.prevent="over = false"
          ref="area">
 
-        <label class="gallery__load-area__label w-full p-2 flex flex-col items-center bg-white text-blue rounded-sm tracking-wide uppercase border border-grey border-dashed cursor-pointer hover:bg-grey-lighter" :class="{'gallery__load-area--over': over}">
+        <label class="gallery__load-area__label w-full p-2 flex flex-col items-center bg-white text-blue rounded-sm tracking-wide uppercase border border-grey border-dashed cursor-pointer hover:bg-grey-lighter"
+               :class="{'gallery__load-area--over': over}">
             <div class="gallery__load-area__value">
                 <slot></slot>
             </div>
 
-            <div class="px-6 py-4 flex flex-col items-center justify-center" :class="{ 'gallery__load-area__buttons--with-content': $slots.default }">
+            <div class="px-6 py-4 flex flex-col items-center justify-center"
+                 :class="{ 'gallery__load-area__buttons--with-content': $slots.default }">
                 <svg class="gallery__load-area__icon w-8 h-8" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
                      viewBox="0 0 20 20">
                     <path d="M16.88 9.1A4 4 0 0 1 16 17H5a5 5 0 0 1-1-9.9V7a3 3 0 0 1 4.52-2.59A4.98 4.98 0 0 1 17 8c0 .38-.04.74-.12 1.1zM11 11h3l-4-4-4 4h3v3h2v-3z"/>
@@ -20,12 +22,14 @@
                     <div v-if="maxSize" class="normal-case text-center text-grey">({{__('макс.') + ' ' + maxSizePretty }})</div>
                 </span>
 
-                <div class="text-grey hover:text-danger text-xl absolute" style="top: 1rem; right: 1rem;" v-if="clear && $slots.default" @click.stop.prevent="$emit('clear')">
+                <div class="text-grey hover:text-danger text-xl absolute" style="top: 1rem; right: 1rem;"
+                     v-if="clear && $slots.default" @click.stop.prevent="$emit('clear')">
                     <i class="far fa-trash-alt"></i>
                 </div>
             </div>
 
-            <input type='file' class="gallery__load-area__input hidden" :multiple="multiple" :accept="accept" @change="load($event, $event.target.files)"/>
+            <input ref='input' type='file' class="gallery__load-area__input hidden" :multiple="multiple" :accept="accept"
+                   @change="load($event.target.files)"/>
         </label>
     </div>
 </template>
@@ -69,8 +73,8 @@
 
         methods: {
             checkSize(file) {
-                if (! file.errors)
-                    file.errors = [];
+                if (!file.errors)
+                    file.errors = []
 
                 if (file.size > this.maxSize * 1000000) {
                     file.errors.push(this.__('Max file size is :sizeMB', {size: this.maxSize}))
@@ -81,12 +85,12 @@
             },
 
             checkMimeType(file) {
-                if (! file.errors)
-                    file.errors = [];
+                if (!file.errors)
+                    file.errors = []
 
                 if (this.accept && this.accept.indexOf(file.type) == -1) {
                     file.errors.push(this.__('File type ":type" is incorrect', {type: file.type}))
-                    return;
+                    return
                 }
 
                 return true
@@ -96,19 +100,19 @@
                 event.preventDefault()
                 this.over = false
 
-                let files = event.dataTransfer.files;
+                let files = event.dataTransfer.files
 
                 this.load(files)
 
                 return false
             },
 
-            load(event, files) {
+            load(files) {
                 [...files].forEach(file => this.checkSize(file) && this.checkMimeType(file))
 
                 this.$emit('load', files)
 
-                event.target.value = "";
+                this.$refs.input.value = ""
             }
         },
     }
