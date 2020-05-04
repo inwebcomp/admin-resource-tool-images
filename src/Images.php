@@ -30,6 +30,11 @@ class Images extends ResourceTool
         return $this->withMeta(['accept' => $value]);
     }
 
+    public function setThumbnail($thumbnail)
+    {
+        return $this->withMeta(['thumbnail' => $thumbnail]);
+    }
+
     public function multiple($value = true)
     {
         return $this->withMeta(['multiple' => $value]);

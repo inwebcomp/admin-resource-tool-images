@@ -58,7 +58,7 @@
         methods: {
             fetch() {
                 App.api.request({
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId,
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
                 }).then(({images}) => {
                     this.images = images
                 })

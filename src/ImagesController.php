@@ -27,8 +27,20 @@ class ImagesController extends Controller
         /** @var WithImages|Entity $model */
         $model = $request->findModelOrFail();
 
+        if ($thumbnail = $request->input('thumbnail')) {
+            $images = [];
+
+            foreach ($model->images as $key => $image) {
+                $data = $image->toArray();
+                $data['url'] = $image->getUrl($thumbnail);
+                $images[] = $data;
+            }
+        } else {
+            $images = $model->images;
+        }
+
         return [
-            'images' => $model->images
+            'images' => $images
         ];
     }
 
