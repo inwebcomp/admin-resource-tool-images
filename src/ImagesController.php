@@ -27,17 +27,7 @@ class ImagesController extends Controller
         /** @var WithImages|Entity $model */
         $model = $request->findModelOrFail();
 
-        if ($thumbnail = $request->input('thumbnail')) {
-            $images = [];
-
-            foreach ($model->images as $key => $image) {
-                $data = $image->toArray();
-                $data['url'] = $image->getUrl($thumbnail);
-                $images[] = $data;
-            }
-        } else {
-            $images = $model->images;
-        }
+        $images = $this->getImagesWithModifiedThumbnail($request, $model->images);
 
         return [
             'images' => $images
@@ -68,6 +58,8 @@ class ImagesController extends Controller
         }
 
         $this->actionEventForCreate($request->user(), $model, $images)->save();
+
+        $images = $this->getImagesWithModifiedThumbnail($request, $images);
 
         return [
             'images' => $images
@@ -180,5 +172,25 @@ class ImagesController extends Controller
             $model::clearCache($model);
 
         Image::updatePositionsById($request->input('images'));
+    }
+
+    /**
+     * @param ResourceDetailRequest $request
+     * @return array
+     */
+    public function getImagesWithModifiedThumbnail(ResourceDetailRequest $request, $images) : array
+    {
+        if ($thumbnail = $request->input('thumbnail')) {
+            $result = [];
+
+            foreach ($images as $key => $image) {
+                $data = $image->toArray();
+                $data['url'] = $image->getUrl($thumbnail);
+                $result[] = $data;
+            }
+        } else {
+            $result = $images;
+        }
+        return $result;
     }
 }

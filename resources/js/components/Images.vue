@@ -143,7 +143,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId,
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
                     data: {
                         images: files
                     },
@@ -176,7 +176,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId,
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
                     data: {
                         url,
                     }
@@ -250,7 +250,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/main/' + image.id,
+                    url: 'resource-tool/images/main/' + image.id + '?thumbnail=' + (this.field.thumbnail || ''),
                 }).then(() => {
                     this.loadingSetMain = false
 
@@ -278,7 +278,7 @@
 
                 App.api.request({
                     method: 'POST',
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '/positions',
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '/positions' + '?thumbnail=' + (this.field.thumbnail || ''),
                     data: {
                         images: this.images.map(image => image.id)
                     }
