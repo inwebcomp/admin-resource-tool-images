@@ -178,7 +178,7 @@ class ImagesController extends Controller
      * @param ResourceDetailRequest $request
      * @return array
      */
-    public function getImagesWithModifiedThumbnail(ResourceDetailRequest $request, $images) : array
+    public function getImagesWithModifiedThumbnail(ResourceDetailRequest $request, $images)
     {
         if ($thumbnail = $request->input('thumbnail')) {
             $result = [];
@@ -191,6 +191,7 @@ class ImagesController extends Controller
         } else {
             $result = $images;
         }
+
         return $result;
     }
 }
