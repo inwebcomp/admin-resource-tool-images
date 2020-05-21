@@ -167,6 +167,8 @@
                         images.length > 1 ? this.__('The images was uploaded!') : this.__('The image was uploaded!'),
                         {type: 'success'}
                     )
+                }).catch(() => {
+                    this.loading = false
                 })
             },
 
@@ -196,6 +198,8 @@
                         images.length > 1 ? this.__('The images was uploaded!') : this.__('The image was uploaded!'),
                         {type: 'success'}
                     )
+                }).catch(() => {
+                    this.loading = false
                 })
             },
 
