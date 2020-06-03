@@ -88,7 +88,7 @@
                             loading: false
                         }
 
-                        if (this.multiple) {
+                        if (this.field.multiple) {
                             this.loadedImages.push(fileData)
                         } else {
                             this.loadedImages = [fileData]
