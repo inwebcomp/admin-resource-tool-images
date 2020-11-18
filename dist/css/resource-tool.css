@@ -219,3 +219,17 @@
   display: block;
 }
 
+.gallery__types {
+  border-bottom: 2px solid #5a69c6;
+  margin-top: 0;
+}
+
+.gallery__type {
+  color: #5a69c6;
+}
+
+.gallery__type.tab--active {
+  color: #FFF;
+  background-color: #5a69c6;
+}
+

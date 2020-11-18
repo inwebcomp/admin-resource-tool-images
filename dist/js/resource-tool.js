@@ -1547,6 +1547,14 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1576,20 +1584,29 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             loading: false,
             loadingRemove: false,
             loadingSetMain: false,
-            fastDelete: false
+            fastDelete: false,
+            selectedType: null
         };
     },
     created: function created() {
+        if (this.field.types && Object.keys(this.field.types).length) {
+            this.selectedType = Object.keys(this.field.types)[0];
+        }
+
         this.fetch();
     },
 
 
     methods: {
+        changeType: function changeType(type) {
+            this.selectedType = type;
+            this.fetch();
+        },
         fetch: function fetch() {
             var _this = this;
 
             App.api.request({
-                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '')
+                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || '')
             }).then(function (_ref) {
                 var images = _ref.images;
 
@@ -1681,7 +1698,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             App.api.request({
                 method: 'PUT',
-                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
+                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                 data: {
                     images: files
                 }
@@ -1721,7 +1738,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             App.api.request({
                 method: 'PUT',
-                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
+                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                 data: {
                     url: url
                 }
@@ -1801,7 +1818,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             App.api.request({
                 method: 'PUT',
-                url: 'resource-tool/images/main/' + image.id + '?thumbnail=' + (this.field.thumbnail || '')
+                url: 'resource-tool/images/main/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || '')
             }).then(function () {
                 _this6.loadingSetMain = false;
 
@@ -1836,7 +1853,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             App.api.request({
                 method: 'PUT',
-                url: 'resource-tool/images/language/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&language=' + language
+                url: 'resource-tool/images/language/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&language=' + language + '&type=' + (this.selectedType || '')
             }).then(function () {
                 _this7.loadingSetLanguage = false;
 
@@ -1869,7 +1886,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
             App.api.request({
                 method: 'POST',
-                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '/positions' + '?thumbnail=' + (this.field.thumbnail || ''),
+                url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '/positions' + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                 data: {
                     images: this.images.map(function (image) {
                         return image.id;
@@ -10398,6 +10415,29 @@ var render = function() {
     "div",
     { staticClass: "gallery" },
     [
+      _vm.field.types
+        ? _c(
+            "div",
+            { staticClass: "gallery__types tabs mb-4" },
+            _vm._l(_vm.field.types, function(title, type) {
+              return _c(
+                "div",
+                {
+                  staticClass: "gallery__type tab",
+                  class: { "tab--active": type == _vm.selectedType },
+                  on: {
+                    click: function($event) {
+                      return _vm.changeType(type)
+                    }
+                  }
+                },
+                [_vm._v(_vm._s(title))]
+              )
+            }),
+            0
+          )
+        : _vm._e(),
+      _vm._v(" "),
       _c("load-area", {
         staticClass: "mb-4",
         attrs: {

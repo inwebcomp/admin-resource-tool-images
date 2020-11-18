@@ -47,4 +47,9 @@ class Images extends ResourceTool
 
         return $this->withMeta(['languages' => $value]);
     }
+
+    public function withTypes($value)
+    {
+        return $this->withMeta(['types' => $value]);
+    }
 }

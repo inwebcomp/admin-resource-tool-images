@@ -1,5 +1,13 @@
 <template>
     <div class="gallery">
+        <div class="gallery__types tabs mb-4" v-if="field.types">
+            <div class="gallery__type tab"
+                 :class="{'tab--active': type == selectedType}"
+                 v-for="(title, type) in field.types"
+                 @click="changeType(type)"
+            >{{ title }}</div>
+        </div>
+
         <load-area @load="load" class="mb-4" :max-size="field.maxSize" :accept="field.accept"
                    :multiple="field.multiple"/>
         <div class="text-center my-4">{{ __('или') }}</div>
@@ -53,17 +61,27 @@
                 loadingRemove: false,
                 loadingSetMain: false,
                 fastDelete: false,
+                selectedType: null,
             }
         },
 
         created() {
+            if (this.field.types && Object.keys(this.field.types).length) {
+                this.selectedType = Object.keys(this.field.types)[0]
+            }
+
             this.fetch()
         },
 
         methods: {
+            changeType(type) {
+                this.selectedType = type
+                this.fetch()
+            },
+
             fetch() {
                 App.api.request({
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                 }).then(({images}) => {
                     this.images = images
                 })
@@ -148,7 +166,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                     data: {
                         images: files
                     },
@@ -183,7 +201,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || ''),
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                     data: {
                         url,
                     }
@@ -259,7 +277,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/main/' + image.id + '?thumbnail=' + (this.field.thumbnail || ''),
+                    url: 'resource-tool/images/main/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                 }).then(() => {
                     this.loadingSetMain = false
 
@@ -292,7 +310,7 @@
 
                 App.api.request({
                     method: 'PUT',
-                    url: 'resource-tool/images/language/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&language=' + language,
+                    url: 'resource-tool/images/language/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&language=' + language + '&type=' + (this.selectedType || ''),
                 }).then(() => {
                     this.loadingSetLanguage = false
 
@@ -329,7 +347,7 @@
 
                 App.api.request({
                     method: 'POST',
-                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '/positions' + '?thumbnail=' + (this.field.thumbnail || ''),
+                    url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '/positions' + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
                     data: {
                         images: this.images.map(image => image.id)
                     }

@@ -27,7 +27,11 @@ class ImagesController extends Controller
         /** @var WithImages|Entity $model */
         $model = $request->findModelOrFail();
 
-        $images = $this->getImagesWithModifiedThumbnail($request, $model->images(true)->get());
+        $type = $request->input('type', null);
+
+        $images = $model->images($type, true)->get();
+
+        $images = $this->getImagesWithModifiedThumbnail($request, $images);
 
         return [
             'images' => $images
@@ -49,14 +53,16 @@ class ImagesController extends Controller
 
         $inputImages = $request->input('images');
 
+        $type = $request->input('type', false);
+
         if ($inputImages) {
             foreach ($inputImages as $image) {
-                $newImage = $model->images()->add($image['full_urls']['default'], true, $image['name']);
+                $newImage = $model->images($type)->add($image['full_urls']['default'], true, $image['name']);
                 $newImage->refresh();
                 $images[] = $newImage;
             }
         } else if ($url = $request->input('url')) {
-            $newImage = $model->images()->add($url, true);
+            $newImage = $model->images($type)->add($url, true);
             $newImage->refresh();
             $images[] = $newImage;
         }
