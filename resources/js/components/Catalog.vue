@@ -1,6 +1,15 @@
 <template>
     <draggable v-bind="dragOptions" :value="images" @input="$emit('changePositions', $event)" class="gallery__catalog flex flex-wrap -mx-2">
-        <image-element class="mx-2 mb-4" v-for="(image, $i) in images" :key="$i" @remove="$emit('remove', $i)" @setMain="$emit('setMain', $i)" :main="image.main" :zoom="image.url">
+        <image-element :languages="languages"
+                       class="mx-2 mb-4"
+                       v-for="(image, $i) in images"
+                       :key="$i"
+                       @remove="$emit('remove', $i)"
+                       @setMain="$emit('setMain', $i)"
+                       @setLanguage="$emit('setLanguage', {index: $i, language: $event})"
+                       :main="image.main"
+                       :language="image.language"
+                       :zoom="image.url">
             <img :src="image.url" alt="">
         </image-element>
     </draggable>
@@ -15,7 +24,8 @@
         components: {ImageElement,Draggable},
 
         props: {
-            images: {}
+            images: {},
+            languages: {},
         },
 
         computed: {

@@ -14,7 +14,12 @@
             </label>
         </div>
 
-        <catalog :images="images" @remove="remove" @changePositions="changePositions" @setMain="setMain"></catalog>
+        <catalog :images="images"
+                 :languages="field.languages"
+                 @remove="remove"
+                 @changePositions="changePositions"
+                 @setMain="setMain"
+                 @setLanguage="setLanguage"/>
     </div>
 </template>
 
@@ -164,7 +169,7 @@
                     this.upload()
 
                     this.$toasted.show(
-                        images.length > 1 ? this.__('The images was uploaded!') : this.__('The image was uploaded!'),
+                        images.length > 1 ? this.__('Изображения были загружены') : this.__('Изображение было загружено'),
                         {type: 'success'}
                     )
                 }).catch(() => {
@@ -195,7 +200,7 @@
                     this.upload()
 
                     this.$toasted.show(
-                        images.length > 1 ? this.__('The images was uploaded!') : this.__('The image was uploaded!'),
+                        images.length > 1 ? this.__('Изображения были загружены') : this.__('Изображение было загружено'),
                         {type: 'success'}
                     )
                 }).catch(() => {
@@ -208,7 +213,7 @@
                     return
 
                 if (!this.fastDelete) {
-                    if (!confirm(this.__('Are you sure to delete the image?')))
+                    if (!confirm(this.__('Вы действительно хотите удалить изображение?')))
                         return
                 }
 
@@ -235,7 +240,7 @@
                         this.images[0].main = true
 
                     this.$toasted.show(
-                        this.__('The image was removed!'),
+                        this.__('Изображение было удалено'),
                         {type: 'success'}
                     )
                 }).catch(() => {
@@ -261,14 +266,56 @@
                     App.$emit('imageSetMain', image)
                     App.$emit('indexRefresh')
 
-                    this.images.forEach((value, i) => value.main = i === index)
+                    this.images.forEach((value, i) => {
+                        if (! value.language || value.language == image.language) {
+                            value.main = i === index
+                        }
+                    })
 
                     this.$toasted.show(
-                        this.__('The image was set as main!'),
+                        this.__('Главное изображение установлено'),
                         {type: 'success'}
                     )
                 }).catch(() => {
                     this.loadingSetMain = false
+                })
+            },
+
+            setLanguage({index, language}) {
+                if (this.loadingSetLanguage)
+                    return
+
+                this.loadingSetLanguage = true
+
+                let image = this.images.find((value, i) => i === index)
+                image.loading = true
+
+                App.api.request({
+                    method: 'PUT',
+                    url: 'resource-tool/images/language/' + image.id + '?thumbnail=' + (this.field.thumbnail || '') + '&language=' + language,
+                }).then(() => {
+                    this.loadingSetLanguage = false
+
+                    App.$emit('imageSetLanguage', image)
+                    App.$emit('indexRefresh')
+
+                    image.language = language
+
+                    let count = 0
+                    this.images.forEach((value, i) => {
+                        if (! value.language || value.language == image.language) {
+                            count++
+                        }
+                    })
+                    if (count > 1)
+                        image.main = false
+
+                    this.$toasted.show(
+                        this.__('Язык установлен'),
+                        {type: 'success'}
+                    )
+                }).catch(() => {
+                    this.loadingSetLanguage = false
                 })
             },
 
@@ -292,7 +339,7 @@
                     App.$emit('imageChangePositions')
 
                     this.$toasted.show(
-                        this.__('Images positions were changed'),
+                        this.__('Позиции изображений изменены'),
                         {type: 'success'}
                     )
                 }).catch(() => {

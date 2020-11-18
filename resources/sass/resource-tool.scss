@@ -78,6 +78,13 @@
             height: 100%;
         }
     }
+
+    &__language {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        z-index: 1;
+    }
 }
 
 .gallery__element__overlay {

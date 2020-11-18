@@ -27,7 +27,7 @@ class ImagesController extends Controller
         /** @var WithImages|Entity $model */
         $model = $request->findModelOrFail();
 
-        $images = $this->getImagesWithModifiedThumbnail($request, $model->images);
+        $images = $this->getImagesWithModifiedThumbnail($request, $model->images(true)->get());
 
         return [
             'images' => $images
@@ -51,10 +51,14 @@ class ImagesController extends Controller
 
         if ($inputImages) {
             foreach ($inputImages as $image) {
-                $images[] = $model->images()->add($image['full_urls']['default'], true, $image['name']);
+                $newImage = $model->images()->add($image['full_urls']['default'], true, $image['name']);
+                $newImage->refresh();
+                $images[] = $newImage;
             }
         } else if ($url = $request->input('url')) {
-            $images[] = $model->images()->add($url, true);
+            $newImage = $model->images()->add($url, true);
+            $newImage->refresh();
+            $images[] = $newImage;
         }
 
         $this->actionEventForCreate($request->user(), $model, $images)->save();
@@ -90,6 +94,17 @@ class ImagesController extends Controller
     public function main(Image $image)
     {
         $image->setMain();
+    }
+
+    /**
+     * @param ResourceDetailRequest $request
+     * @param Image $image
+     */
+    public function setLanguage(ResourceDetailRequest $request, Image $image)
+    {
+        $language = $request->input('language', null);
+
+        $image->setLanguage($language);
     }
 
     /**

@@ -39,4 +39,12 @@ class Images extends ResourceTool
     {
         return $this->withMeta(['multiple' => $value]);
     }
+
+    public function withLanguages($value = null)
+    {
+        if (! $value)
+            $value = config('inweb.languages');
+
+        return $this->withMeta(['languages' => $value]);
+    }
 }

@@ -1,18 +1,29 @@
 <template>
-    <component :is="zoom ? 'a' : 'div'" :href="zoom" target="_blank" class="gallery__element gallery__image">
+    <div class="gallery__element gallery__image">
         <slot></slot>
 
-        <div class="gallery__element__overlay gallery__element__overlay--transparent">
+        <component :is="zoom ? 'a' : 'div'" target="_blank" :href="zoom" class="gallery__element__overlay gallery__element__overlay--transparent">
             <div class="gallery__element__remove" @click.stop.prevent="$emit('remove')">
                 <i class="far fa-trash-alt"></i>
             </div>
-            <i v-if="zoom" class="fal fa-search-plus gallery__element__overlay__zoom"></i>
-        </div>
 
-        <div class="gallery__element__main" :class="{'gallery__element__main--active': main}" :title="__('Главное изображение')" @click.prevent="! main && $emit('setMain')">
+            <i v-if="zoom" class="fal fa-search-plus gallery__element__overlay__zoom"></i>
+        </component>
+
+        <div class="gallery__element__main" :class="{'gallery__element__main--active': main}"
+             :title="__('Главное изображение')" @click.prevent="! main && $emit('setMain')">
             <i class="fa-star" :class="main ? 'fas' : 'far'"></i>
         </div>
-    </component>
+
+        <app-select v-if="languages" small
+                    class="gallery__element__language"
+                    :emptyTitle="'--'"
+                    @select="$emit('setLanguage', $event)"
+                    :options="languageOptions"
+                    :value="language"
+                    withEmpty
+                    :search="false"/>
+    </div>
 </template>
 
 <script>
@@ -21,7 +32,22 @@
 
         props: {
             main: {},
+            language: {},
             zoom: {},
+            languages: {},
+        },
+
+        data: () => ({
+            languageOptions: [],
+        }),
+
+        created() {
+            if (this.languages) {
+                this.languageOptions = this.languages.map(item => ({
+                    value: item,
+                    title: item.toUpperCase(),
+                }))
+            }
         },
     }
 </script>
