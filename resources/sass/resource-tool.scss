@@ -30,8 +30,12 @@
 .gallery__element {
     width: 16rem;
     max-height: 16rem;
+    min-height: 5.2rem;
+    background-color: #f8f8f8;
     position: relative;
     height: fit-content;
+    display: flex;
+    align-items: center;
 
     img {
         border-radius: .125rem;
