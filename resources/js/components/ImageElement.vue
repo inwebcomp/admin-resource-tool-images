@@ -8,6 +8,10 @@
             </div>
 
             <i v-if="zoom" class="fal fa-search-plus gallery__element__overlay__zoom"></i>
+
+            <div class="gallery__element__overlay__size" v-if="sizeInfo">
+                {{ sizeInfo.width }} x {{ sizeInfo.height }}
+            </div>
         </component>
 
         <div class="gallery__element__main" :class="{'gallery__element__main--active': main}"
@@ -35,6 +39,7 @@
             language: {},
             zoom: {},
             languages: {},
+            sizeInfo: {},
         },
 
         data: () => ({

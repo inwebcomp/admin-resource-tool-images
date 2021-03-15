@@ -8,6 +8,7 @@
                        @setMain="$emit('setMain', $i)"
                        @setLanguage="$emit('setLanguage', {index: $i, language: $event})"
                        :main="image.main"
+                       :sizeInfo="{width: image.width, height: image.height}"
                        :language="image.language"
                        :zoom="image.url">
             <img :src="image.url" alt="">

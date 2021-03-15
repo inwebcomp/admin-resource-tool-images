@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use InWeb\Admin\App\Actions\ActionEvent;
 use InWeb\Admin\App\Http\Controllers\Controller;
@@ -30,6 +32,18 @@ class ImagesController extends Controller
         $type = $request->input('type', null);
 
         $images = $model->images($type, true)->get();
+
+        $images->each(function(Image $image) {
+            $path = Storage::disk('public')->path($image->getPath());
+
+            if (! File::exists($path))
+                return;
+
+            [$width, $height] = getimagesize($path);
+
+            $image->width = $width;
+            $image->height = $height;
+        });
 
         $images = $this->getImagesWithModifiedThumbnail($request, $images);
 
