@@ -16,7 +16,13 @@
         <loaded-files v-if="loadedImages.length" :images="loadedImages" @remove="removeLoaded"
                       @upload="upload"></loaded-files>
 
-        <div class="my-4">
+        <div class="flex items-center my-4">
+            <app-button @click.native="fetch" small class="mr-4">
+                <i class="far fa-sync-alt mr-2" style="font-size: 1rem"></i>
+                {{ __('Обновить') }}
+            </app-button>
+
+
             <label class="flex items-center">{{ __('Удаление без подтверждения') }}
                 <switch-input class="ml-4" v-model="fastDelete"></switch-input>
             </label>
