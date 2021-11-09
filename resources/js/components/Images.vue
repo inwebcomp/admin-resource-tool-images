@@ -98,7 +98,12 @@
             },
 
             load(files) {
-                Array.from(files).forEach(file => {
+                files = Array.from(files)
+
+                let count = files.length
+                let index = 0
+
+                files.forEach(file => {
                     let errors = file.errors
                     file = new File([file], file.name, {type: file.type})
                     let reader = new FileReader()
@@ -123,7 +128,10 @@
                             this.loadedImages = [fileData]
                         }
 
-                        this.upload()
+                        index++
+
+                        if (index == count)
+                            this.upload()
                     }
                 })
             },
@@ -182,7 +190,9 @@
                     }
                 }).then(({images}) => {
                     App.$emit('imageUploaded', files)
-                    App.$emit('indexRefresh')
+
+                    if (this.loadedImages.length == 1)
+                        App.$emit('indexRefresh')
 
                     this.loading = false
 
