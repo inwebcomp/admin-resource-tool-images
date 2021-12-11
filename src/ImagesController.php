@@ -33,22 +33,8 @@ class ImagesController extends Controller
 
         $images = $model->images($type, true)->get();
 
-        $images->each(function(Image $image) {
-            $path = Storage::disk('public')->path($image->getPath());
-
-            if (! File::exists($path))
-                return;
-
-            [$width, $height] = getimagesize($path);
-
-            $image->width = $width;
-            $image->height = $height;
-        });
-
-        $images = $this->getImagesWithModifiedThumbnail($request, $images);
-
         return [
-            'images' => $images
+            'images' => ImageResource::collection($images)
         ];
     }
 
@@ -65,13 +51,13 @@ class ImagesController extends Controller
 
         $images = [];
 
-        $inputImages = $request->input('images');
+        $inputImages = $request->file('images');
 
         $type = $request->input('type', false);
 
         if ($inputImages) {
             foreach ($inputImages as $image) {
-                $newImage = $model->images($type)->add($image['full_urls']['default'], true, $image['name']);
+                $newImage = $model->images($type)->add($image, true, $image->getClientOriginalName());
                 $newImage->refresh();
                 $images[] = $newImage;
             }
@@ -83,10 +69,8 @@ class ImagesController extends Controller
 
         $this->actionEventForCreate($request->user(), $model, $images)->save();
 
-        $images = $this->getImagesWithModifiedThumbnail($request, $images);
-
         return [
-            'images' => $images
+            'images' => ImageResource::collection(collect($images))
         ];
     }
 
@@ -207,26 +191,5 @@ class ImagesController extends Controller
             $model::clearCache($model);
 
         Image::updatePositionsById($request->input('images'));
-    }
-
-    /**
-     * @param ResourceDetailRequest $request
-     * @return array
-     */
-    public function getImagesWithModifiedThumbnail(ResourceDetailRequest $request, $images)
-    {
-        if ($thumbnail = $request->input('thumbnail')) {
-            $result = [];
-
-            foreach ($images as $key => $image) {
-                $data = $image->toArray();
-                $data['url'] = $image->getUrl($thumbnail);
-                $result[] = $data;
-            }
-        } else {
-            $result = $images;
-        }
-
-        return $result;
     }
 }

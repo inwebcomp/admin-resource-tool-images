@@ -1,7 +1,7 @@
 <template>
     <div class="gallery__loaded-files flex flex-wrap -mx-2">
         <element-for-load class="mx-2 mb-4" v-for="(image, $i) in images" :key="$i" :loading="image.loading" :progress="image.progress" :errors="image.errors" @remove="$emit('remove', $i)" @upload="$emit('upload', $i)">
-            <img :src="image.full_urls.default" alt="">
+            <img :src="image.dataUrl" alt="">
         </element-for-load>
 
         <hr class="gallery__hr mt-2 mb-6">

@@ -10,7 +10,7 @@
                        :main="image.main"
                        :sizeInfo="{width: image.width, height: image.height}"
                        :language="image.language"
-                       :zoom="image.url">
+                       :zoom="image.original_url">
             <img :src="image.url" alt="">
         </image-element>
     </draggable>

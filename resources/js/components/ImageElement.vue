@@ -9,13 +9,13 @@
 
             <i v-if="zoom" class="fal fa-search-plus gallery__element__overlay__zoom"></i>
 
-            <div class="gallery__element__overlay__size" v-if="sizeInfo">
+            <div class="gallery__element__overlay__size" v-if="sizeInfo && sizeInfo.width && sizeInfo.height">
                 {{ sizeInfo.width }} x {{ sizeInfo.height }}
             </div>
         </component>
 
         <div class="gallery__element__main" :class="{'gallery__element__main--active': main}"
-             :title="__('Главное изображение')" @click.prevent="! main && $emit('setMain')">
+             :title="main ? __('Главное изображение') : __('Сделать главным')" @click.prevent="! main && $emit('setMain')">
             <i class="fa-star" :class="main ? 'fas' : 'far'"></i>
         </div>
 

@@ -43,8 +43,6 @@
     import LoadedFiles from "./LoadedFiles"
     import Catalog from "./Catalog"
 
-    import axios from 'axios'
-
     export default {
         components: {
             Catalog,
@@ -97,7 +95,7 @@
                 this.loadedImages = this.loadedImages.filter((value, i) => i !== index)
             },
 
-            load(files) {
+            load(files, uploadCallback) {
                 files = Array.from(files)
 
                 let count = files.length
@@ -112,13 +110,12 @@
                     reader.onload = () => {
                         const fileData = {
                             file: file,
-                            full_urls: {
-                                default: reader.result,
-                            },
+                            dataUrl: reader.result,
                             name: file.name,
                             file_name: file.name,
                             errors: errors,
                             progress: 0,
+                            sending: false,
                             loading: false
                         }
 
@@ -130,13 +127,17 @@
 
                         index++
 
-                        if (index == count)
-                            this.upload()
+                        if (index === count) {
+                            if (!uploadCallback)
+                                uploadCallback = this.upload
+
+                            uploadCallback()
+                        }
                     }
                 })
             },
 
-            upload(index = 0) {
+            upload(uploadCallback) {
                 if (!this.loadedImages.length) {
                     this.loading = false
                     return
@@ -147,30 +148,25 @@
 
                 this.loading = true
 
-                let file
+                let files = []
 
-                while (true) {
-                    if (!this.loadedImages[index]) {
-                        this.loading = false
+                this.loadedImages.forEach(file => {
+                    if (file.errors.length) {
+                        file.loading = false
                         return
                     }
+                    file.loading = true
+                    files.push(file)
+                })
 
-                    file = this.loadedImages[index]
-
-                    if (!file.errors.length)
-                        break
-
-                    index++
+                if (!uploadCallback) {
+                    this.uploadRequest(files)
+                } else {
+                    uploadCallback(files)
                 }
-
-                file.loading = true
-
-                this.uploadRequest(file, index)
             },
 
-            uploadRequest(file, index) {
-                let files = [file]
-
+            uploadRequest(files, index) {
                 files = files.filter(file => !file.sending)
 
                 if (!files.length)
@@ -178,25 +174,33 @@
 
                 files.forEach(file => file.sending = true)
 
+                let formData = new FormData()
+                formData.append('_method', 'PUT')
+                files.forEach(file => {
+                    formData.append('images[]', file.file)
+                    file.sending = true
+                })
+
                 App.api.request({
-                    method: 'PUT',
+                    method: 'POST',
                     url: 'resource-tool/images/' + this.resourceName + '/' + this.resourceId + '?thumbnail=' + (this.field.thumbnail || '') + '&type=' + (this.selectedType || ''),
-                    data: {
-                        images: files
-                    },
+                    data: formData,
                 }, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                     onUploadProgress: (progressEvent) => {
                         files.forEach(file => file.progress = progressEvent.loaded / progressEvent.total)
                     }
                 }).then(({images}) => {
-                    App.$emit('imageUploaded', files)
-
-                    if (this.loadedImages.length == 1)
-                        App.$emit('indexRefresh')
-
                     this.loading = false
 
-                    this.loadedImages = this.loadedImages.filter((value, i) => i !== index)
+                    if (this.loadedImages.length === 1)
+                        App.$emit('indexRefresh')
+
+                    files.forEach(file => {
+                        this.loadedImages = this.loadedImages.filter(value => value.name !== file.name)
+                    })
 
                     this.images.push(...images)
 
@@ -206,6 +210,8 @@
                         images.length > 1 ? this.__('Изображения были загружены') : this.__('Изображение было загружено'),
                         {type: 'success'}
                     )
+
+                    App.$emit('imageUploaded', files)
                 }).catch(() => {
                     this.loading = false
                 })
@@ -300,11 +306,13 @@
                     App.$emit('imageSetMain', image)
                     App.$emit('indexRefresh')
 
-                    this.images.forEach((value, i) => {
-                        if (! value.language || value.language == image.language) {
-                            value.main = i === index
-                        }
-                    })
+                    // this.images.forEach((value, i) => {
+                    //     if (! value.language || value.language == image.language) {
+                    //         value.main = i === index
+                    //     }
+                    // })
+
+                    this.fetch()
 
                     this.$toasted.show(
                         this.__('Главное изображение установлено'),
@@ -335,14 +343,16 @@
 
                     image.language = language
 
-                    let count = 0
-                    this.images.forEach((value, i) => {
-                        if (! value.language || value.language == image.language) {
-                            count++
-                        }
-                    })
-                    if (count > 1)
-                        image.main = false
+                    // let count = 0
+                    // this.images.forEach((value, i) => {
+                    //     if (! value.language || value.language == image.language) {
+                    //         count++
+                    //     }
+                    // })
+                    // if (count > 1)
+                    //     image.main = false
+
+                    this.fetch()
 
                     this.$toasted.show(
                         this.__('Язык установлен'),

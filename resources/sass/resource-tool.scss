@@ -117,7 +117,7 @@
         transition: opacity .15s ease;
         position: absolute;
         bottom: 4px;
-        left: 6px;
+        right: 6px;
     }
 }
 
@@ -197,9 +197,15 @@
     left: 0;
     display: none;
     text-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+    transition: all .15s ease;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
 
     &:hover i {
-        font-weight: 900;
+        //color: var(--accent);
+        //font-weight: 900;
     }
 }
 
