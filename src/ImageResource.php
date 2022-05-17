@@ -17,7 +17,7 @@ class ImageResource extends JsonResource
         /** @var Image $this */
         $path = $this->getStorage()->path($this->getPath());
 
-        if (!File::exists($path)) {
+        if (File::exists($path)) {
             [$width, $height] = getimagesize($path);
 
             $this->width = $width;
